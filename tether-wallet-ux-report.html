@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tether Wallet — UX/UI 设计分析报告</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #1D9E75;
+    --green-d: #0F6E56;
+    --green-l: #E1F5EE;
+    --amber: #BA7517;
+    --amber-l: #FAEEDA;
+    --red: #A32D2D;
+    --red-l: #FCEBEB;
+    --blue: #185FA5;
+    --blue-l: #E6F1FB;
+    --purple: #534AB7;
+    --purple-l: #EEEDFE;
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.14);
+    --text: #1A1A1A;
+    --text-2: #555550;
+    --text-3: #8A8A85;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  html { font-size: 15px; -webkit-font-smoothing: antialiased; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ─── COVER ─── */
+  .cover {
+    background: #0B2E22;
+    color: #fff;
+    padding: 72px 64px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 480px; height: 480px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(29,158,117,.35) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.45);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cover-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: rgba(255,255,255,.3);
+  }
+  .cover-logo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .cover-icon {
+    width: 56px; height: 56px;
+    background: var(--green);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 300;
+    color: #fff;
+    letter-spacing: -1px;
+  }
+  .cover-brand { font-size: 22px; font-weight: 400; color: #fff; }
+  .cover-brand span { color: rgba(255,255,255,.5); }
+  .cover-title {
+    font-size: 42px;
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    color: #fff;
+    margin-bottom: 20px;
+    max-width: 560px;
+  }
+  .cover-title strong { font-weight: 500; color: #6DE5B4; }
+  .cover-desc {
+    font-size: 15px;
+    color: rgba(255,255,255,.55);
+    max-width: 460px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 32px;
+    border-top: 1px solid rgba(255,255,255,.1);
+    padding-top: 24px;
+  }
+  .cover-meta-item { }
+  .cover-meta-label { font-size: 11px; color: rgba(255,255,255,.4); margin-bottom: 4px; letter-spacing: .06em; }
+  .cover-meta-value { font-size: 14px; color: rgba(255,255,255,.8); }
+
+  /* ─── LAYOUT ─── */
+  .container { max-width: 960px; margin: 0 auto; padding: 0 32px; }
+  .page-body { padding: 48px 0 80px; }
+
+  /* ─── SECTION ─── */
+  .section { margin-bottom: 52px; }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 500;
+    min-width: 28px;
+  }
+  .section-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -.2px;
+  }
+  .section-sub {
+    font-size: 13px;
+    color: var(--text-3);
+    margin-left: auto;
+  }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .card-body {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.65;
+  }
+
+  /* ─── GRID ─── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+
+  /* ─── TAGS ─── */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-family: var(--mono);
+    letter-spacing: .01em;
+  }
+  .tag-green { background: var(--green-l); color: var(--green-d); }
+  .tag-amber { background: var(--amber-l); color: var(--amber); }
+  .tag-red   { background: var(--red-l);   color: var(--red); }
+  .tag-blue  { background: var(--blue-l);  color: var(--blue); }
+  .tag-purple{ background: var(--purple-l);color: var(--purple); }
+
+  /* ─── HIGHLIGHT BOX ─── */
+  .highlight {
+    background: #0B2E22;
+    color: #fff;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .highlight::after {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(29,158,117,.2);
+    pointer-events: none;
+  }
+  .highlight .card-title { color: #6DE5B4; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; }
+  .highlight p { color: rgba(255,255,255,.8); font-size: 14px; line-height: 1.7; }
+
+  /* ─── METRIC CARDS ─── */
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .metric-label { font-size: 11px; color: var(--text-3); margin-bottom: 6px; letter-spacing: .04em; }
+  .metric-value { font-size: 26px; font-weight: 300; color: var(--text); line-height: 1; margin-bottom: 4px; letter-spacing: -1px; font-family: var(--mono); }
+  .metric-sub { font-size: 11px; color: var(--text-3); }
+
+  /* ─── SCORE BARS ─── */
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .score-row:last-child { border-bottom: none; }
+  .score-label { font-size: 13px; color: var(--text); min-width: 160px; }
+  .score-bar-bg { flex: 1; height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 3px; }
+  .score-num { font-family: var(--mono); font-size: 13px; font-weight: 500; min-width: 36px; text-align: right; }
+  .score-note { font-size: 11px; color: var(--text-3); min-width: 240px; text-align: right; }
+
+  /* ─── FLOW ─── */
+  .flow-wrap { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 16px 0; }
+  .flow-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 13px;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .flow-arrow { color: var(--text-3); font-size: 13px; }
+
+  /* ─── DOTS ─── */
+  .dot-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .dot-green { background: var(--green); }
+  .dot-amber { background: #EF9F27; }
+  .dot-red   { background: #E24B4A; }
+  .dot-text { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+  .dot-text strong { color: var(--text); font-weight: 500; }
+
+  /* ─── TABLE ─── */
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { text-align: left; padding: 8px 12px; font-weight: 500; font-size: 11px; color: var(--text-3); letter-spacing: .05em; border-bottom: 1px solid var(--border-strong); }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text-2); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  td:first-child { color: var(--text-3); font-size: 12px; }
+
+  /* ─── PRIORITY CARDS ─── */
+  .priority-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .priority-card-left { min-width: 60px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding-top: 2px; }
+  .priority-num { font-family: var(--mono); font-size: 22px; font-weight: 400; color: var(--border-strong); line-height: 1; }
+  .priority-card-body .card-title { margin-bottom: 6px; }
+
+  /* ─── COMPARE ─── */
+  .vs-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .vs-card-pos { border-left: 3px solid var(--green); }
+  .vs-card-neg { border-left: 3px solid #E24B4A; }
+
+  /* ─── COLOR SWATCH ─── */
+  .swatch-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .swatch { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); flex-shrink: 0; }
+  .swatch-info .swatch-name { font-size: 13px; color: var(--text); }
+  .swatch-info .swatch-hex { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    background: #0B2E22;
+    color: rgba(255,255,255,.4);
+    text-align: center;
+    padding: 28px 32px;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .footer strong { color: rgba(255,255,255,.7); }
+
+  /* ─── PRINT ─── */
+  @media print {
+    body { background: #fff; }
+    .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  .pill-wrap { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* animated entry */
+  @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: none; } }
+  .section { animation: fadeUp .4s ease both; }
+  .section:nth-child(2) { animation-delay: .05s; }
+  .section:nth-child(3) { animation-delay: .1s; }
+  .section:nth-child(4) { animation-delay: .15s; }
+  .section:nth-child(5) { animation-delay: .2s; }
+  .section:nth-child(6) { animation-delay: .25s; }
+  .section:nth-child(7) { animation-delay: .3s; }
+  .section:nth-child(8) { animation-delay: .35s; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="container">
+    <div class="cover-eyebrow">UX/UI 设计分析报告</div>
+    <div class="cover-logo">
+      <div class="cover-icon">₮</div>
+      <div class="cover-brand">tether<span>.</span>wallet</div>
+    </div>
+    <h1 class="cover-title">
+      <strong>The People's Wallet</strong><br>
+      产品设计深度分析
+    </h1>
+    <p class="cover-desc">
+      从 UX 策略、信息架构、视觉风格、设计亮点与风险，到可落地的改进建议 — 面向 Web3 钱包 UX/UI 设计师的完整参考文档。
+    </p>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">分析对象</div>
+        <div class="cover-meta-value">wallet.tether.io</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">产品状态</div>
+        <div class="cover-meta-value">2025 年 4 月正式上线</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">平台</div>
+        <div class="cover-meta-value">iOS · Android · APK</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">报告日期</div>
+        <div class="cover-meta-value">2025 年 4 月</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="page-body">
+<div class="container">
+
+  <!-- 01 产品概况 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">产品概况与定位</h2>
+    </div>
+
+    <div class="highlight" style="margin-bottom:16px;">
+      <div class="card-title">核心主张</div>
+      <p>Tether 首款面向 C 端用户的自托管钱包。将 USDT / USAT / XAU₮ / BTC 的技术复杂性全部屏蔽在底层 — 无需管理 gas token，用户名替代钱包地址，云备份 + 离线助记词双保险。目标是让零加密基础的普通用户，像使用微信转账一样使用数字资产。</p>
+    </div>
+
+    <div class="grid-4" style="margin-bottom:16px;">
+      <div class="metric"><div class="metric-label">支持资产</div><div class="metric-value">4</div><div class="metric-sub">USDT · USAT · XAU₮ · BTC</div></div>
+      <div class="metric"><div class="metric-label">支持网络</div><div class="metric-value">6+</div><div class="metric-sub">ETH · Polygon · Arbitrum · Lightning</div></div>
+      <div class="metric"><div class="metric-label">托管方式</div><div class="metric-value" style="font-size:16px;padding-top:4px;font-family:var(--font);">自托管</div><div class="metric-sub">私钥本地签名，不经服务器</div></div>
+      <div class="metric"><div class="metric-label">底层技术</div><div class="metric-value" style="font-size:14px;padding-top:4px;font-family:var(--font);">WDK</div><div class="metric-sub">开源 Wallet Dev Kit</div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">产品标语</div>
+        <div class="card-body">"The People's Wallet" — 面向被传统金融体系排斥的 10 亿人，与 M-Pesa、Cash App 竞争，而非 MetaMask。</div>
+      </div>
+      <div class="card">
+        <div class="card-title">核心技术优势</div>
+        <div class="card-body">基于 WDK（Wallet Development Kit）构建，开源可定制，已完成独立安全审计，支持 Account Abstraction 实现无 gas 体验。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 目标用户 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">目标用户 & 使用场景</h2>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🌍 新兴市场用户（核心）</div>
+        <div class="card-body">高通胀国家（阿根廷、尼日利亚、土耳其）需要稳定价值储存；没有银行账户但有智能手机的人群；跨境汇款场景 — 劳工寄钱回家乡，手续费比 Western Union 低 90%+。</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔰 Crypto 新手</div>
+        <div class="card-body">第一次接触数字货币；对 gas fee、助记词、多链概念感到恐惧；希望「像用微信转账一样」使用加密资产；可能来自 Tether 官方渠道或社区推荐。</div>
+      </div>
+      <div class="card">
+        <div class="card-title">💼 USDT 重度用户</div>
+        <div class="card-body">目前在 CEX 持有大量 USDT，想要自托管控制权；需要频繁跨链转账，厌倦了管理多个网络 gas 代币；重视资产安全但厌烦复杂操作。</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🤖 未来：AI Agent（路线图）</div>
+        <div class="card-body">WDK 的长期战略目标，为 AI 代理自主支付、机器间交易提供基础设施。CEO Paolo Ardoino 明确表示「将是数十亿钱包的底层基石」。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 核心功能 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">核心功能亮点</h2>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div class="card" style="border-left:3px solid var(--green);">
+        <div class="card-title">① @username 转账系统</div>
+        <div class="card-body">用 @tether.me 用户名替代长串十六进制地址。支持 LNURL 协议，与其他闪电网络钱包互通。无需复制粘贴，零出错风险。<br><br><span style="font-size:11px;font-family:var(--mono);color:var(--green);">设计影响：行业 Top 3 UX 创新</span></div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--green);">
+        <div class="card-title">② Gas 抽象化</div>
+        <div class="card-body">自动用转账代币支付网络费，用户无需持有 ETH / MATIC 等 gas token。底层通过 Account Abstraction 实现，对用户完全透明。<br><br><span style="font-size:11px;font-family:var(--mono);color:var(--green);">设计影响：解决新手最大痛点</span></div>
+      </div>
+      <div class="card" style="border-left:3px solid #378ADD;">
+        <div class="card-title">③ 双通道云备份</div>
+        <div class="card-body">加密数据分存 Tether 服务器 + 用户 iCloud/Google Drive，双方均无法单独解密。恢复时只需邮箱登录，无需手动输入 12 个单词。<br><br><span style="font-size:11px;font-family:var(--mono);color:var(--blue);">设计影响：降低助记词遗失损失</span></div>
+      </div>
+      <div class="card" style="border-left:3px solid #EF9F27;">
+        <div class="card-title">④ 多链智能路由</div>
+        <div class="card-body">App 自动展示可用网络和余额，不需要用户理解「Ethereum 和 Polygon 有什么区别」。转账前显示完整费用摘要，无隐藏惊喜。<br><br><span style="font-size:11px;font-family:var(--mono);color:var(--amber);">设计影响：技术复杂度对用户隐藏</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 信息架构 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">信息架构分析</h2>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-title" style="margin-bottom:14px;">主要用户流程</div>
+
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:6px;letter-spacing:.04em;">ONBOARDING</div>
+      <div class="flow-wrap" style="margin-bottom:16px;">
+        <div class="flow-box">下载 App</div><div class="flow-arrow">→</div>
+        <div class="flow-box">输入邮箱 + 密码</div><div class="flow-arrow">→</div>
+        <div class="flow-box">设置 @username</div><div class="flow-arrow">→</div>
+        <div class="flow-box">选择备份方式（云/助记词）</div><div class="flow-arrow">→</div>
+        <div class="flow-box" style="background:var(--green-l);border-color:var(--green);color:var(--green-d);">钱包创建完成 ✓</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:6px;letter-spacing:.04em;">发送资产</div>
+      <div class="flow-wrap" style="margin-bottom:16px;">
+        <div class="flow-box">首页点击 Send</div><div class="flow-arrow">→</div>
+        <div class="flow-box">输入地址 / @名 / 扫码</div><div class="flow-arrow">→</div>
+        <div class="flow-box">选择代币 + 网络</div><div class="flow-arrow">→</div>
+        <div class="flow-box">输入金额</div><div class="flow-arrow">→</div>
+        <div class="flow-box">查看费用摘要</div><div class="flow-arrow">→</div>
+        <div class="flow-box" style="background:var(--green-l);border-color:var(--green);color:var(--green-d);">确认发送 ✓</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:6px;letter-spacing:.04em;">接收资产</div>
+      <div class="flow-wrap">
+        <div class="flow-box">点击 Receive</div><div class="flow-arrow">→</div>
+        <div class="flow-box">选择代币</div><div class="flow-arrow">→</div>
+        <div class="flow-box">选择网络</div><div class="flow-arrow">→</div>
+        <div class="flow-box" style="background:var(--green-l);border-color:var(--green);color:var(--green-d);">分享 @名 or QR 码 ✓</div>
+      </div>
+    </div>
+
+    <div class="vs-wrap">
+      <div class="card vs-card-pos">
+        <div class="card-title" style="color:var(--green-d);margin-bottom:10px;">✓ 架构亮点</div>
+        <div class="dot-row"><div class="dot dot-green"></div><div class="dot-text">Onboarding 步骤极短，无 KYC，3步完成入场</div></div>
+        <div class="dot-row"><div class="dot dot-green"></div><div class="dot-text">网络复杂度对用户隐藏，App 自动推荐可用路由</div></div>
+        <div class="dot-row"><div class="dot dot-green"></div><div class="dot-text">转账前显示完整费用摘要（到账量、手续费、总成本、法币等值）</div></div>
+        <div class="dot-row"><div class="dot dot-green"></div><div class="dot-text">FAQ 内容质量高，边界情况（如 Send Max 的 fee 扣减逻辑）表述清楚</div></div>
+        <div class="dot-row"><div class="dot dot-green"></div><div class="dot-text">删账号 & 找回钱包的流程设计安全合规</div></div>
+      </div>
+      <div class="card vs-card-neg">
+        <div class="card-title" style="color:var(--red);margin-bottom:10px;">✗ 潜在问题</div>
+        <div class="dot-row"><div class="dot dot-red"></div><div class="dot-text"><strong>BTC 双模式暴露：</strong>链上 vs Lightning 的选择新手无从判断，需要引导</div></div>
+        <div class="dot-row"><div class="dot dot-red"></div><div class="dot-text"><strong>多链余额混淆：</strong>USDT 分布在 4 条链时，用户不知道「我一共有多少」</div></div>
+        <div class="dot-row"><div class="dot dot-amber"></div><div class="dot-text">删除账号入口较深（Settings → Security → Delete），路径较长</div></div>
+        <div class="dot-row"><div class="dot dot-amber"></div><div class="dot-text">V1 资产品类极少，未来扩展时导航架构需提前规划，避免大改</div></div>
+        <div class="dot-row"><div class="dot dot-amber"></div><div class="dot-text">官网缺乏互动演示，对潜在用户的转化说服力不足</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 竞品对比 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">竞品设计对比</h2>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>维度</th>
+            <th>Tether Wallet</th>
+            <th>MetaMask</th>
+            <th>Trust Wallet</th>
+            <th>Phantom</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Onboarding 步骤</td>
+            <td><span class="tag tag-green">3 步</span></td>
+            <td><span class="tag tag-red">6 步+</span></td>
+            <td><span class="tag tag-amber">4 步</span></td>
+            <td><span class="tag tag-amber">4 步</span></td>
+          </tr>
+          <tr>
+            <td>Gas 抽象化</td>
+            <td><span class="tag tag-green">✓ 原生支持</span></td>
+            <td><span class="tag tag-red">✗ 手动管理</span></td>
+            <td><span class="tag tag-red">✗ 手动管理</span></td>
+            <td><span class="tag tag-amber">部分支持</span></td>
+          </tr>
+          <tr>
+            <td>可读地址</td>
+            <td><span class="tag tag-green">@username</span></td>
+            <td><span class="tag tag-amber">ENS 支持</span></td>
+            <td><span class="tag tag-red">无</span></td>
+            <td><span class="tag tag-amber">.sol 域名</span></td>
+          </tr>
+          <tr>
+            <td>新手友好度</td>
+            <td><span class="tag tag-green">最高</span></td>
+            <td><span class="tag tag-red">低（极客向）</span></td>
+            <td><span class="tag tag-amber">中</span></td>
+            <td><span class="tag tag-amber">中</span></td>
+          </tr>
+          <tr>
+            <td>资产种类</td>
+            <td><span class="tag tag-amber">4种（聚焦）</span></td>
+            <td><span class="tag tag-green">万种+</span></td>
+            <td><span class="tag tag-green">百种+</span></td>
+            <td><span class="tag tag-green">百种+（Solana）</span></td>
+          </tr>
+          <tr>
+            <td>云备份</td>
+            <td><span class="tag tag-green">✓ 双密钥加密</span></td>
+            <td><span class="tag tag-red">✗</span></td>
+            <td><span class="tag tag-red">✗</span></td>
+            <td><span class="tag tag-amber">部分</span></td>
+          </tr>
+          <tr>
+            <td>目标用户</td>
+            <td><span class="tag tag-blue">大众普通用户</span></td>
+            <td><span class="tag tag-purple">开发者 / DeFi</span></td>
+            <td><span class="tag tag-blue">中级用户</span></td>
+            <td><span class="tag tag-purple">Solana 生态</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 06 视觉风格 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2 class="section-title">视觉风格分析</h2>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px;">主色板</div>
+        <div class="swatch-row">
+          <div class="swatch" style="background:#1D9E75;border:none;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Tether Green（主品牌色）</div>
+            <div class="swatch-hex">#1D9E75</div>
+          </div>
+        </div>
+        <div class="swatch-row">
+          <div class="swatch" style="background:#0B2E22;border:none;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Deep Green（深色背景）</div>
+            <div class="swatch-hex">#0B2E22</div>
+          </div>
+        </div>
+        <div class="swatch-row">
+          <div class="swatch" style="background:#6DE5B4;border:none;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Mint Accent（暗底强调色）</div>
+            <div class="swatch-hex">#6DE5B4</div>
+          </div>
+        </div>
+        <div class="swatch-row">
+          <div class="swatch" style="background:#FFFFFF;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">White（主背景）</div>
+            <div class="swatch-hex">#FFFFFF</div>
+          </div>
+        </div>
+        <div class="swatch-row">
+          <div class="swatch" style="background:#F5F5F0;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Off-white（页面底色）</div>
+            <div class="swatch-hex">#F5F5F0</div>
+          </div>
+        </div>
+        <div class="swatch-row">
+          <div class="swatch" style="background:#1A1A1A;border:none;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Near-black（主文字色）</div>
+            <div class="swatch-hex">#1A1A1A</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-title" style="margin-bottom:10px;">视觉五要素</div>
+          <div style="display:grid;grid-template-columns:60px 1fr;gap:8px;font-size:13px;">
+            <div style="font-weight:500;color:var(--text);">形</div><div style="color:var(--text-2);">大圆角卡片 + 圆形代币图标，柔和亲切，去除金融冷硬感</div>
+            <div style="font-weight:500;color:var(--text);">色</div><div style="color:var(--text-2);">单一绿色强调色配纯白底，极度克制；Light mode 为主视觉</div>
+            <div style="font-weight:500;color:var(--text);">字</div><div style="color:var(--text-2);">层级清晰，余额数字强调处理；系统字体或 Inter 类无衬线</div>
+            <div style="font-weight:500;color:var(--text);">质</div><div style="color:var(--text-2);">Flat 扁平风格，无渐变无阴影；代币图标使用官方品牌图标</div>
+            <div style="font-weight:500;color:var(--text);">构</div><div style="color:var(--text-2);">手机 Mockup 居中，功能卡片整齐排列，营销网站结构感强</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:8px;">风格定位</div>
+          <div style="margin-bottom:10px;"><div style="font-size:11px;color:var(--text-3);margin-bottom:5px;">风格关键词</div>
+            <div class="pill-wrap"><span class="tag tag-green">极简可信</span><span class="tag tag-green">大众友好</span><span class="tag tag-blue">轻金融感</span><span class="tag tag-amber">去 DeFi 调性</span></div></div>
+          <div style="margin-bottom:10px;"><div style="font-size:11px;color:var(--text-3);margin-bottom:5px;">更接近</div>
+            <div class="pill-wrap"><span class="tag tag-green">≈ Cash App</span><span class="tag tag-green">≈ Revolut</span><span class="tag tag-blue">≈ Wise</span></div></div>
+          <div><div style="font-size:11px;color:var(--text-3);margin-bottom:5px;">有意远离</div>
+            <div class="pill-wrap"><span class="tag tag-red">≠ MetaMask 极客感</span><span class="tag tag-red">≠ OKX 暗黑风</span><span class="tag tag-red">≠ Uniswap 紫色</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 UX 评分 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2 class="section-title">UX 设计维度评分</h2>
+      <span class="section-sub">满分 10 分</span>
+    </div>
+
+    <div class="card">
+      <div class="score-row">
+        <div class="score-label">新手友好度</div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:85%;background:var(--green);"></div></div>
+        <div class="score-num" style="color:var(--green);">8.5</div>
+        <div class="score-note">Gas 抽象 + 用户名系统是行业领先水平</div>
+      </div>
+      <div class="score-row">
+        <div class="score-label">Onboarding 流畅度</div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:90%;background:var(--green);"></div></div>
+        <div class="score-num" style="color:var(--green);">9.0</div>
+        <div class="score-note">3步入场，无 KYC，极少阻力</div>
+      </div>
+      <div class="score-row">
+        <div class="score-label">安全感知建立</div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:85%;background:var(--green);"></div></div>
+        <div class="score-num" style="color:var(--green);">8.5</div>
+        <div class="score-note">自托管 + 本地签名 + 双密钥备份信任感强</div>
+      </div>
+      <div class="score-row">
+        <div class="score-label">错误预防设计</div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:80%;background:var(--green);"></div></div>
+        <div class="score-num" style="color:var(--green);">8.0</div>
+        <div class="score-note">确认页透明度高，QR 扫码减少手输错误</div>
+      </div>
+      <div class="score-row">
+        <div class="score-label">视觉一致性</div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:80%;background:var(--green);"></div></div>
+        <div class="score-num" style="color:var(--green);">8.0</div>
+        <div class="score-note">品牌色克制，风格统一，暗模式适配待验证</div>
+      </div>
+      <div class="score-row">
+        <div class="score-label">文案质量</div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:80%;background:var(--green);"></div></div>
+        <div class="score-num" style="color:var(--green);">8.0</div>
+        <div class="score-note">官网文案清晰，避免了 Web3 黑话</div>
+      </div>
+      <div class="score-row">
+        <div class="score-label">信息架构清晰度</div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:75%;background:#EF9F27;"></div></div>
+        <div class="score-num" style="color:var(--amber);">7.5</div>
+        <div class="score-note">多链余额视图仍有混淆风险</div>
+      </div>
+      <div class="score-row">
+        <div class="score-label">Web3 功能完整度</div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:55%;background:#E24B4A;"></div></div>
+        <div class="score-num" style="color:var(--red);">5.5</div>
+        <div class="score-note">V1 只有收发，无 Swap / DeFi / NFT</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 设计建议 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h2 class="section-title">优先级改进建议</h2>
+    </div>
+
+    <div class="priority-card" style="border-left:3px solid #E24B4A;">
+      <div class="priority-card-left">
+        <span class="tag tag-red">P0</span>
+        <div class="priority-num" style="color:#E24B4A;">01</div>
+      </div>
+      <div class="priority-card-body">
+        <div class="card-title">BTC 网络选择的新手引导</div>
+        <div class="card-body">当用户接收/发送 BTC 时，「链上」vs「闪电网络」的选择应有内联说明（小额快速 → Lightning；大额安全 → 链上），或者直接根据金额/场景智能推荐 — 用户只需确认，不需要理解技术差异。理想 UX 是：系统推荐 → 用户确认 → 若想了解可点击展开解释。</div>
+      </div>
+    </div>
+
+    <div class="priority-card" style="border-left:3px solid #EF9F27;">
+      <div class="priority-card-left">
+        <span class="tag tag-amber">P1</span>
+        <div class="priority-num" style="color:#EF9F27;">02</div>
+      </div>
+      <div class="priority-card-body">
+        <div class="card-title">总资产聚合视图</div>
+        <div class="card-body">当 USDT 分布在多条链时，首页应显示「USDT 总余额：$500」而不是「Ethereum $200 / Polygon $300」。用户核心关心的是「我有多少美元」，链只是底层路由细节，应可折叠查看。类比：银行 App 显示「活期账户 $500」，不显示「工行网点 A $200 + 工行网点 B $300」。</div>
+      </div>
+    </div>
+
+    <div class="priority-card" style="border-left:3px solid #EF9F27;">
+      <div class="priority-card-left">
+        <span class="tag tag-amber">P1</span>
+        <div class="priority-num" style="color:#EF9F27;">03</div>
+      </div>
+      <div class="priority-card-body">
+        <div class="card-title">渐进式情境教育（Contextual Onboarding）</div>
+        <div class="card-body">不做一次性 Walkthrough，而是在用户真正需要时出现提示：第一次收到 USDT 时 → 解释「这是 USDT，价值等同 1 美元」；第一次发送时 → 解释网络费是什么、为什么；余额接近 0 时 → 提示如何获取更多资产。减少认知负荷，提高首次转账成功率。</div>
+      </div>
+    </div>
+
+    <div class="priority-card" style="border-left:3px solid #378ADD;">
+      <div class="priority-card-left">
+        <span class="tag tag-blue">P2</span>
+        <div class="priority-num" style="color:#378ADD;">04</div>
+      </div>
+      <div class="priority-card-body">
+        <div class="card-title">交易历史可读性增强</div>
+        <div class="card-body">目前可能显示「0x123...abc 发送了 100 USDT via Polygon」。建议改为：若对方有 @username 则显示 @name；显示法币等值（≈$100.00）；加入自然语言时间戳（2小时前）；交易状态标签（已确认 / 处理中）；发/收用颜色区分（绿色 + 红色）。</div>
+      </div>
+    </div>
+
+    <div class="priority-card" style="border-left:3px solid #378ADD;">
+      <div class="priority-card-left">
+        <span class="tag tag-blue">P2</span>
+        <div class="priority-num" style="color:#378ADD;">05</div>
+      </div>
+      <div class="priority-card-body">
+        <div class="card-title">官网增加交互演示</div>
+        <div class="card-body">目前官网是纯静态展示。建议在「How it works」区域加入可交互的发送/接收伪 Demo，让用户在下载前就能「体验」发 @username 转账的流程。对新市场用户（不熟悉 App Store 下载流程）尤其有效，可直接提升下载转化率。</div>
+      </div>
+    </div>
+
+    <div class="priority-card" style="border-left:3px solid var(--green);">
+      <div class="priority-card-left">
+        <span class="tag tag-green">P3</span>
+        <div class="priority-num" style="color:var(--green-d);">06</div>
+      </div>
+      <div class="priority-card-body">
+        <div class="card-title">导航架构提前规划（长期）</div>
+        <div class="card-body">V1 只有 4 种资产，但 WDK 路线图持续扩展。建议现在确立：资产列表排序逻辑（余额优先？常用频率？）；未来 Swap / DeFi 功能入口的位置（Tab Bar？卡片入口？）；多资产时的分组策略（稳定币 / 黄金 / 比特币）。避免后期大改导航影响老用户肌肉记忆。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 09 对自身产品的参考价值 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <h2 class="section-title">对 Web3 产品设计的参考价值</h2>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">预付卡产品可借鉴</div>
+        <div class="dot-row"><div class="dot dot-green"></div><div class="dot-text"><strong>Gas 抽象思路：</strong>预付卡用户同样不应感知手续费计算，确认页应直接呈现「到账金额」而非「扣除网络费」</div></div>
+        <div class="dot-row"><div class="dot dot-green"></div><div class="dot-text"><strong>总余额聚合视图：</strong>预付卡余额显示应简洁，避免暴露底层 USDT 网络细节</div></div>
+        <div class="dot-row"><div class="dot dot-green"></div><div class="dot-text"><strong>分步安全教育：</strong>KYC 后的资产安全提示可参考其渐进式教育节奏，不做一次性轰炸</div></div>
+        <div class="dot-row"><div class="dot dot-amber"></div><div class="dot-text"><strong>极简策略边界：</strong>预付卡有实体卡、KYC、额度等复杂性，不能完全照搬 Tether 的「4种资产」极简策略</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">交易平台可借鉴</div>
+        <div class="dot-row"><div class="dot dot-green"></div><div class="dot-text"><strong>@username 系统：</strong>站内转账若有此功能，出错率大幅下降；用户名比地址更安全友好</div></div>
+        <div class="dot-row"><div class="dot dot-green"></div><div class="dot-text"><strong>确认页透明度：</strong>每笔 Spot/Perps 交易确认前，费用结构应像 Tether Wallet 一样完整呈现，建立用户信任</div></div>
+        <div class="dot-row"><div class="dot dot-green"></div><div class="dot-text"><strong>云备份模式：</strong>如有 MPC 钱包或密钥托管功能，可参考「双密钥分存」的信任建立叙事</div></div>
+        <div class="dot-row"><div class="dot dot-amber"></div><div class="dot-text"><strong>注意差异：</strong>交易平台用户需要数据密度，Tether Wallet 的极简策略 ≠ 适合 Spot/Perps 交易场景</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+</div><!-- /page-body -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <strong>Tether Wallet UX/UI 设计分析报告</strong><br>
+  分析对象：wallet.tether.io · 报告生成于 2025 年 4 月<br>
+  本报告基于公开信息整理，仅供设计参考使用
+</div>
+
+</body>
+</html>
